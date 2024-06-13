@@ -14,6 +14,7 @@ export type Quiz = {
 
 export type Action =
   | { type: "START_ADDING_NEW_QUIZ"; payload: string}
+  | { type: "GO_BACK"}
   | { type: "START_EDITING_QUIZ"; payload: string}
   | { type: "START_QUIZ"; payload: string }
   | { type: "NEXT_QUESTION"; payload: string }

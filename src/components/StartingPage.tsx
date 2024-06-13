@@ -1,5 +1,4 @@
 import { useContext, useRef } from "react";
-import { Header } from "./Header";
 import { QuizList } from "./QuizList";
 import { QuizContext } from "../store/QuizContext";
 
@@ -8,16 +7,22 @@ export const StartingPage: React.FC = () => {
   const { quizes } = state;
   const inputRef = useRef<HTMLInputElement>(null);
 
-
   const handleStartAddingNewQuiz = () => {
-      if(inputRef.current !== null && inputRef.current.value.trim() !== ""){
-        dispatch({ type: "START_ADDING_NEW_QUIZ", payload: inputRef.current.value });
-      }
+    if (inputRef.current !== null && inputRef.current.value.trim() !== "") {
+      dispatch({
+        type: "START_ADDING_NEW_QUIZ",
+        payload: inputRef.current.value,
+      });
+    }
   };
 
   return (
     <>
-      <Header />
+      <header>
+        <h1 className="text-6xl text-yellow-600 animate-pulse mb-8">
+          Choose Quiz
+        </h1>
+      </header>
       {quizes.map((quiz) => (
         <QuizList key={quiz.id} quiz={quiz} />
       ))}
@@ -30,7 +35,12 @@ export const StartingPage: React.FC = () => {
         className="border-2 border-gray-800 rounded-lg p-2 m-2"
         defaultValue={""}
       />
-      <button  onClick={handleStartAddingNewQuiz}className="bg-gradient-to-r from-yellow-200 to-yellow-400 text-gray-800">Submit</button>
+      <button
+        onClick={handleStartAddingNewQuiz}
+        className="bg-gradient-to-r from-yellow-200 to-yellow-400 text-gray-800"
+      >
+        Submit
+      </button>
     </>
   );
 };

@@ -20,7 +20,7 @@ const initialState: State = {
   isAddingNewQuiz: false,
   newQuizTitle: "",
   isQuizEditing: false,
-  editingQuizId : '',
+  editingQuizId: "",
   isQuizStarted: false,
   quizFinished: false,
   userAnswers: [],
@@ -40,9 +40,9 @@ const quizReducer = (state: State, action: Action) => {
   const maxIndex = currentQuiz.questions.length;
   const difficulty = currentQuestion.difficulty;
   const points =
-    (difficulty === "easy" && 1) ||
-    (difficulty === "medium" && 2) ||
-    (difficulty === "hard" && 3) ||
+    (difficulty === "easy" && 10) ||
+    (difficulty === "medium" && 20) ||
+    (difficulty === "hard" && 30) ||
     0;
 
   switch (action.type) {
@@ -59,22 +59,22 @@ const quizReducer = (state: State, action: Action) => {
       };
     }
 
-    case 'START_EDITING_QUIZ': {
+    case "START_EDITING_QUIZ": {
       return { ...state, isQuizEditing: true, editingQuizId: action.payload };
     }
 
-    case 'STOP_EDIT_QUIZ' :
+    case "STOP_EDIT_QUIZ":
       return {
-      ...state,
-      quizes: state.quizes.map(quiz => {
-        if (quiz.id === action.payload.id) {
-        return action.payload;
-        }
-        return quiz;
-      }),
-      isQuizEditing: false,
-      editingQuizId: '',
-      }
+        ...state,
+        quizes: state.quizes.map((quiz) => {
+          if (quiz.id === action.payload.id) {
+            return action.payload;
+          }
+          return quiz;
+        }),
+        isQuizEditing: false,
+        editingQuizId: "",
+      };
     case "DELETE_QUIZ":
       return {
         ...state,
@@ -86,6 +86,10 @@ const quizReducer = (state: State, action: Action) => {
         isQuizStarted: true,
         currentQuizId: action.payload,
       };
+
+    case "GO_BACK":
+      return { ...state, isAddingNewQuiz: false, isQuizEditing: false};
+
     case "NEXT_QUESTION":
       console.log(
         currentQuestion?.rightAnswer,
@@ -98,20 +102,18 @@ const quizReducer = (state: State, action: Action) => {
         if (state.currentQuestionIndex + 1 === maxIndex) {
           return {
             ...state,
-            score:
-            currentQuestion?.rightAnswer.includes(action.payload)
-                ? state.score + points
-                : state.score,
+            score: currentQuestion?.rightAnswer.includes(action.payload)
+              ? state.score + points
+              : state.score,
             userAnswers: [...state.userAnswers, action.payload],
             quizFinished: true,
           };
         } else {
           return {
             ...state,
-            score:
-              currentQuestion?.rightAnswer.includes(action.payload)
-                ? state.score + points
-                : state.score,
+            score: currentQuestion?.rightAnswer.includes(action.payload)
+              ? state.score + points
+              : state.score,
             secondsRemining: 10,
             currentQuestionIndex: state.currentQuestionIndex + 1,
             userAnswers: [...state.userAnswers, action.payload],

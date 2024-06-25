@@ -1,4 +1,4 @@
-# Portfolio Project (Qiz)
+# Portfolio Project (Quiz)
 
 ## Description
 This is my personal portfolio project showcasing my skills in React, TypeScript, Custom Hooks (React), and Tailwind. It includes detailed information about my work and how to get in touch with me.

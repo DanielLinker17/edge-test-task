@@ -39,13 +39,13 @@ To use this project, follow these steps:
 2. Open your web browser and visit `http://localhost:3000` to view the project.
 
 ## Features
-- Play Quizes
-- Add,delete or edit new quizes
-- Choose the difficulty level of the question
-- Build-in Timer for each Question
-- UseLocalStorage custo implementation
-- Staistics
-- Responsive Design
+Play Quizzes: Engage in a variety of quizzes.
+CRUD Operations for Quizzes: Add, delete, or edit quizzes easily.
+Difficulty Levels: Choose the difficulty level of each question.
+Built-in Timer: A timer for each question to enhance the challenge.
+Custom useLocalStorage Hook: Efficiently manage quiz data using local storage.
+Statistics: Track your progress and performance.
+Responsive Design: Enjoy a seamless experience on any device.
 
 ## Contributing
 If you would like to contribute to this project, please follow these guidelines:

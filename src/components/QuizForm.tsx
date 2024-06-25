@@ -1,25 +1,35 @@
-import { useContext } from "react";
+import { useContext, useState, useEffect } from "react";
 import { QuizContext } from "../store/QuizContext";
-import { useLocalStorage } from "../hooks/useLocalStorage";
-import { Question } from "../types/types";
+import { Question, Quiz } from "../types/types";
+import { getCurrentQuiz } from "../helpers/getCurrentQuestionAndQuiz";
 import { createUniqueId } from "../helpers/createUniqueId";
 
-export const NewQuizForm: React.FC = () => {
+export const QuizForm: React.FC = () => {
   const { dispatch, state } = useContext(QuizContext);
-  const [newAnswer, setNewAnswer] = useLocalStorage("newAnswer", "");
-  const [newQuestion, setNewQuestion] = useLocalStorage("newQuestion", {
+  const { quizes, editingQuizId, isQuizEditing, isAddingNewQuiz, newQuizTitle } = state;
+  
+  const targetQuiz = getCurrentQuiz(quizes, editingQuizId);
+  
+  const [newAnswer, setNewAnswer] = useState("");
+  const [newQuestion, setNewQuestion] = useState<Question>({
     title: "",
     answers: [],
     rightAnswer: "",
     difficulty: "",
   });
+  const [quiz, setQuiz] = useState<Quiz | null>(null);
 
-  const [newQuiz, setnewQuiz] = useLocalStorage("newQuiz", {
-    id: createUniqueId(),
-    title: state.newQuizTitle,
-    questions: [],
-    isEditing: false,
-  });
+  useEffect(() => {
+    if (isQuizEditing) {
+      setQuiz({ ...targetQuiz });
+    } else if (isAddingNewQuiz) {
+      setQuiz({
+        id: createUniqueId(),
+        title: newQuizTitle,
+        questions: [],
+      });
+    }
+  }, [isQuizEditing, isAddingNewQuiz, targetQuiz, newQuizTitle]);
 
   const handleQuestionTitle = (e: React.ChangeEvent<HTMLInputElement>) => {
     setNewQuestion({ ...newQuestion, title: e.target.value });
@@ -44,9 +54,7 @@ export const NewQuizForm: React.FC = () => {
   };
 
   const handleDeleteAnswer = (index: number) => {
-    const newAnswers = newQuestion.answers.filter(
-      (_: unknown, answerIndex: number) => answerIndex !== index
-    );
+    const newAnswers = newQuestion.answers.filter((_, answerIndex) => answerIndex !== index);
     setNewQuestion({ ...newQuestion, answers: newAnswers });
   };
 
@@ -56,7 +64,7 @@ export const NewQuizForm: React.FC = () => {
 
   const handleGoBack = () => {
     dispatch({ type: "GO_BACK" });
-  }
+  };
 
   const handleAddAnotherQuestion = () => {
     if (
@@ -69,10 +77,11 @@ export const NewQuizForm: React.FC = () => {
       return;
     }
 
-    setnewQuiz({
-      ...newQuiz,
-      questions: [...newQuiz.questions, { ...newQuestion }],
-    });
+    setQuiz((prevQuiz) => ({
+      ...prevQuiz!,
+      questions: [...prevQuiz!.questions, { ...newQuestion }],
+    }));
+
     setNewQuestion({
       title: "",
       answers: [],
@@ -82,28 +91,35 @@ export const NewQuizForm: React.FC = () => {
   };
 
   const handleDeleteQuestion = (index: number) => {
-    const newQuestions = newQuiz.questions.filter(
-      (_: unknown, questionIndex: number) => questionIndex !== index
-    );
-    setnewQuiz({ ...newQuiz, questions: newQuestions });
+    setQuiz((prevQuiz) => ({
+      ...prevQuiz!,
+      questions: prevQuiz!.questions.filter((_, questionIndex) => questionIndex !== index),
+    }));
   };
 
   const handleRightAnswer = (e: React.ChangeEvent<HTMLInputElement>) => {
     setNewQuestion({ ...newQuestion, rightAnswer: e.target.value });
   };
 
-  const handleAddnewQuiz = () => {
-    if (newQuiz.questions.length === 0) {
+  const handleSubmit = () => {
+    if (quiz!.questions.length === 0) {
       alert("Please add some questions to your quiz");
       return;
     }
-    dispatch({ type: "ADD_QUIZ", payload: newQuiz });
+
+    if (isQuizEditing) {
+      dispatch({ type: "STOP_EDIT_QUIZ", payload: quiz! });
+    } else if (isAddingNewQuiz) {
+      dispatch({ type: "ADD_QUIZ", payload: quiz! });
+    }
   };
 
   return (
     <div className="border-2 border-yellow-300 rounded-xl p-10 space-y-10">
       <div className="flex items-center">
-        <h1 className=" text-yellow-300 text-2xl font-bold">Your quiz name: {newQuiz.title}</h1>
+        <h1 className="text-yellow-300 text-2xl font-bold">
+          Your quiz name: {quiz?.title}
+        </h1>
         <button
           onClick={handleGoBack}
           type="submit"
@@ -112,8 +128,7 @@ export const NewQuizForm: React.FC = () => {
           Go Back
         </button>
       </div>
-      <h2 className="text-xl font-bold text-gray-300">Add a new question</h2>{" "}
-      {/* Modified line */}
+      <h2 className="text-xl font-bold text-gray-300">Add a new question</h2>
       <input
         onChange={handleQuestionTitle}
         value={newQuestion.title}
@@ -122,7 +137,7 @@ export const NewQuizForm: React.FC = () => {
         className="border-2 border-gray-800 rounded-lg p-2 m-2 w-full"
       />
       <h2 className="text-xl font-bold text-gray-300 mt-2">Add answers</h2>
-      <div className="flex items-center ">
+      <div className="flex items-center">
         <input
           onChange={(e) => setNewAnswer(e.target.value)}
           value={newAnswer}
@@ -139,11 +154,9 @@ export const NewQuizForm: React.FC = () => {
       </div>
       {newQuestion.answers.length !== 0 && (
         <div className="border-2 border-gray-800 rounded-lg p-2 shadow-md space-y-5">
-          {newQuestion.answers.length !== 0 && (
-            <p>Mark the right answer to current question</p>
-          )}
+          {newQuestion.answers.length !== 0 && <p>Mark the right answer to current question</p>}
           <ul style={{ maxHeight: "150px", overflow: "auto" }}>
-            {newQuestion.answers.map((answer: string, index: number) => (
+            {newQuestion.answers.map((answer, index) => (
               <li key={index} className="text-gray-600 m-2 flex items-center">
                 <input
                   value={answer}
@@ -166,9 +179,7 @@ export const NewQuizForm: React.FC = () => {
           </ul>
         </div>
       )}
-      <h2 className="text-xl font-bold text-gray-300">
-        Choose difficulty level
-      </h2>
+      <h2 className="text-xl font-bold text-gray-300">Choose difficulty level</h2>
       <ul className="flex justify-center space-x-10">
         <li key="easy">
           <input
@@ -180,7 +191,7 @@ export const NewQuizForm: React.FC = () => {
             onChange={handleDifficultyLevel}
           />
           <label className="ml-1" htmlFor={`difficulty-easy`}>
-            Easy (10points)
+            Easy (10 points)
           </label>
         </li>
         <li key="middle">
@@ -193,7 +204,7 @@ export const NewQuizForm: React.FC = () => {
             onChange={handleDifficultyLevel}
           />
           <label className="ml-1" htmlFor={`difficulty-middle`}>
-            Middle (20points)
+            Middle (20 points)
           </label>
         </li>
         <li key="hard">
@@ -222,15 +233,12 @@ export const NewQuizForm: React.FC = () => {
         className="border-2 border-gray-800 rounded-lg p-2 shadow-sm shadow-white max-h-200 overflow-y-auto space-y-2"
       >
         <h3 className="text-gray-300 font-bold">
-          {newQuiz.questions.length === 0
+          {quiz?.questions.length === 0
             ? "No questions added yet"
             : "This is the list of your questions:"}
         </h3>
-        {newQuiz.questions.map((question: Question, index: number) => (
-          <li
-            key={index}
-            className="text-yellow-300 flex items-center conten font-bold text-sm"
-          >
+        {quiz?.questions.map((question, index) => (
+          <li key={index} className="text-yellow-300 flex items-center font-bold text-sm">
             <p>{question.title}</p>
             <button
               onClick={() => handleDeleteQuestion(index)}
@@ -241,13 +249,13 @@ export const NewQuizForm: React.FC = () => {
           </li>
         ))}
       </ul>
-      {newQuiz.questions.length !== 0 && (
+      {quiz?.questions.length !== 0 && (
         <button
-          onClick={handleAddnewQuiz}
+          onClick={handleSubmit}
           type="submit"
-          className="border-yellow-300 p-2 rounded-lg w-60 text-xl text-yellow-300 hover:bg-yellow-300 hover:text-gray-800"
+          className="border-yellow-300 p-2 rounded-lg w-60 text-yellow-300 hover:bg-yellow-300 hover:text-gray-800"
         >
-          Submit
+          {isQuizEditing ? "Save Changes" : "Add Quiz"}
         </button>
       )}
     </div>

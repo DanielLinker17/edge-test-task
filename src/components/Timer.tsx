@@ -21,8 +21,7 @@ export default function Timer() {
         bg-gradient-to-r
         from-yellow-500
         to-yellow-300
-        bg-clip-text
-        text-transparent"
+        bg-clip-text"
       >
         {state.secondsRemining}
       </h1>

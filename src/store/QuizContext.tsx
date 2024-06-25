@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-case-declarations */
 import { createContext, useEffect, useReducer } from "react";
 import { initialQuestions } from "../api/initialQuestionsList";
@@ -11,7 +10,6 @@ const initialQuiz: Quiz = {
   title: "React Quiz",
   id: createUniqueId(),
   questions: initialQuestions,
-  isEditing: false,
 };
 
 const initialState: State = {
@@ -26,11 +24,10 @@ const initialState: State = {
   userAnswers: [],
   currentQuestionIndex: 0,
   secondsRemining: 10,
-  score: 0,
 };
 
-const quizReducer = (state: State, action: Action) => {
-  const { currentQuestion, targetQuiz: currentQuiz } =
+const quizReducer = (state: State, action: Action): State => {
+  const { targetQuiz: currentQuiz } =
     getCurrentQuestionAndQuiz(
       state.quizes,
       state.currentQuizId,
@@ -38,48 +35,49 @@ const quizReducer = (state: State, action: Action) => {
     );
 
   const maxIndex = currentQuiz.questions.length;
-  const difficulty = currentQuestion.difficulty;
-  const points =
-    (difficulty === "easy" && 10) ||
-    (difficulty === "medium" && 20) ||
-    (difficulty === "hard" && 30) ||
-    0;
+
 
   switch (action.type) {
-    case "START_ADDING_NEW_QUIZ": {
+    case "START_ADDING_NEW_QUIZ":
       return { ...state, isAddingNewQuiz: true, newQuizTitle: action.payload };
-    }
 
-    case "ADD_QUIZ": {
+    case "ADD_QUIZ":
       return {
         ...state,
         quizes: [...state.quizes, action.payload],
         isAddingNewQuiz: false,
         newQuizTitle: "",
       };
-    }
 
-    case "START_EDITING_QUIZ": {
+    case "START_EDITING_QUIZ":
       return { ...state, isQuizEditing: true, editingQuizId: action.payload };
-    }
 
     case "STOP_EDIT_QUIZ":
       return {
         ...state,
-        quizes: state.quizes.map((quiz) => {
-          if (quiz.id === action.payload.id) {
-            return action.payload;
-          }
-          return quiz;
-        }),
+        quizes: state.quizes.map((quiz) =>
+          quiz.id === action.payload.id ? { ...action.payload } : quiz
+        ),
         isQuizEditing: false,
         editingQuizId: "",
       };
+
     case "DELETE_QUIZ":
+      const nextQuizIndex = state.quizes.findIndex((quiz) => quiz.id === action.payload);
+      let nextQuizId = "";
+      if (nextQuizIndex !== -1) {
+        if (nextQuizIndex + 1 < state.quizes.length) {
+          nextQuizId = state.quizes[nextQuizIndex + 1].id;
+        } else {
+          nextQuizId = state.quizes[0].id;
+        }
+      }
       return {
         ...state,
         quizes: state.quizes.filter((quiz) => quiz.id !== action.payload),
+        currentQuizId: nextQuizId,
       };
+
     case "START_QUIZ":
       return {
         ...state,
@@ -88,37 +86,24 @@ const quizReducer = (state: State, action: Action) => {
       };
 
     case "GO_BACK":
-      return { ...state, isAddingNewQuiz: false, isQuizEditing: false};
+      return { ...state, isAddingNewQuiz: false, isQuizEditing: false };
 
     case "NEXT_QUESTION":
-      console.log(
-        currentQuestion?.rightAnswer,
-        currentQuestion?.difficulty,
-        action.payload,
-        points,
-        state.score
-      );
-      {
-        if (state.currentQuestionIndex + 1 === maxIndex) {
-          return {
-            ...state,
-            score: currentQuestion?.rightAnswer.includes(action.payload)
-              ? state.score + points
-              : state.score,
-            userAnswers: [...state.userAnswers, action.payload],
-            quizFinished: true,
-          };
-        } else {
-          return {
-            ...state,
-            score: currentQuestion?.rightAnswer.includes(action.payload)
-              ? state.score + points
-              : state.score,
-            secondsRemining: 10,
-            currentQuestionIndex: state.currentQuestionIndex + 1,
-            userAnswers: [...state.userAnswers, action.payload],
-          };
-        }
+
+
+      if (state.currentQuestionIndex + 1 === maxIndex) {
+        return {
+          ...state,
+          userAnswers: [...state.userAnswers, action.payload],
+          quizFinished: true,
+        };
+      } else {
+        return {
+          ...state,
+          secondsRemining: 10,
+          currentQuestionIndex: state.currentQuestionIndex + 1,
+          userAnswers: [...state.userAnswers, action.payload],
+        };
       }
 
     case "HANDLE_TIMER":
@@ -132,7 +117,6 @@ const quizReducer = (state: State, action: Action) => {
         userAnswers: [],
         currentQuestionIndex: 0,
         secondsRemining: 10,
-        score: 0,
       };
 
     default:
@@ -140,9 +124,12 @@ const quizReducer = (state: State, action: Action) => {
   }
 };
 
-export const QuizContext = createContext({
+export const QuizContext = createContext<{
+  state: State;
+  dispatch: React.Dispatch<Action>;
+}>({
   state: initialState,
-  dispatch: (_action: Action) => {},
+  dispatch: () => {},
 });
 
 export const QuizProvider: React.FC<QuizProviderProps> = ({ children }) => {
@@ -154,7 +141,7 @@ export const QuizProvider: React.FC<QuizProviderProps> = ({ children }) => {
   const [appState, dispatch] = useReducer(quizReducer, localStorageState);
 
   useEffect(() => {
-    let intervalId: number;
+    let intervalId: number | undefined;
 
     if (appState.isQuizStarted && !appState.quizFinished) {
       intervalId = setInterval(() => {

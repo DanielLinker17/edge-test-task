@@ -3,8 +3,8 @@ import { QuizContext } from "../store/QuizContext";
 import { QuizListProps } from "../types/types";
 
 export const QuizList: React.FC<QuizListProps> = ({ quiz }) => {
-  const { dispatch } = useContext(QuizContext);
-  const { state } = useContext(QuizContext);
+  const { state, dispatch } = useContext(QuizContext);
+  const isOnlyOneQuiz = state.quizes.length === 1;
 
   const handleStartQuiz = (id: string) => {
     dispatch({ type: "START_QUIZ", payload: id });
@@ -15,48 +15,34 @@ export const QuizList: React.FC<QuizListProps> = ({ quiz }) => {
     console.log(quiz.title);
   };
 
-  const handleDelteQuiz = (id: string) => {
+  const handleDeleteQuiz = (id: string) => {
     dispatch({ type: "DELETE_QUIZ", payload: id });
     console.log(state.quizes);
   };
 
   return (
-    <ul className="">
-      <li className=" grid-flow-row">
-        <div
-          className="
-                m-4
-                grid grid-cols-2
-                items-center
-                border-yellow-300 
-                border-2 
-                rounded-lg
-                bg-gradient-to-r
-                from-yellow-100 to-yellow-300"
+    <ul className="border-2 border-yellow-300 rounded-lg sm:w-96 p-4">
+      <li className="flex flex-col items-center space-y-3">
+        <button
+          onClick={() => handleStartQuiz(quiz.id)}
+          className="text-2xl hover:text-yellow-300 cursor-pointer bg-transparent hover:animate-pulse"
         >
-          <p
-            onClick={() => handleStartQuiz(quiz.id)}
-            className="
-                  text-2xl
-                text-black
-                hover:text-yellow-300"
+          {quiz.title}
+        </button>
+        <div className="flex space-x-5">
+          <button
+            className="m-3 hover:text-yellow-300 cursor-pointer"
+            onClick={() => handleStartEditingQuiz(quiz.id)}
           >
-            {quiz.title}
-          </p>
-          <div className=" m-4">
-            <button
-              onClick={() => handleStartEditingQuiz(quiz.id)}
-              className="m-3 hover:text-yellow-300"
-            >
-              Edit
-            </button>
-            <button
-              onClick={() => handleDelteQuiz(quiz.id)}
-              className="hover:text-yellow-300"
-            >
-              Delete
-            </button>
-          </div>
+            Edit
+          </button>
+          <button
+            disabled={isOnlyOneQuiz}
+            onClick={() => handleDeleteQuiz(quiz.id)}
+            className="m-3 hover:text-yellow-300 cursor-pointer"
+          >
+            Delete
+          </button>
         </div>
       </li>
     </ul>

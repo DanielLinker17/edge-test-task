@@ -12,35 +12,40 @@ export const StartingPage: React.FC = () => {
       dispatch({
         type: "START_ADDING_NEW_QUIZ",
         payload: inputRef.current.value,
+        
       });
     }
+    console.log(state);
   };
 
   return (
-    <>
+    <div className="flex-col items-center space-y-10 border-2 border-yellow-300 rounded-xl p-10">
       <header>
-        <h1 className="text-6xl text-yellow-600 animate-pulse mb-8">
-          Choose Quiz
-        </h1>
+        <h1 className="text-5xl text-yellow-600 mb-8">Choose Quiz</h1>
       </header>
       {quizes.map((quiz) => (
-        <QuizList key={quiz.id} quiz={quiz} />
+        <QuizList quiz={quiz} />
       ))}
-      <div className="m-10 text-xl font-bold text-yellow-500">or</div>
-      <h2 className="text-2xl font-bold text-gray-600 mt-5">Add a new quiz</h2>
-      <input
-        ref={inputRef}
-        type="text"
-        placeholder="Quiz title"
-        className="border-2 border-gray-800 rounded-lg p-2 m-2"
-        defaultValue={""}
-      />
-      <button
-        onClick={handleStartAddingNewQuiz}
-        className="bg-gradient-to-r from-yellow-200 to-yellow-400 text-gray-800"
-      >
-        Submit
-      </button>
-    </>
+      <div className=" flex-col itmes-center space-y-5">
+        <h2 className="text-2xl font-bold text-gray-600 mt-5">
+          or create new one
+        </h2>
+        <div className="flex items-center">
+          <input
+            ref={inputRef}
+            type="text"
+            placeholder="Quiz title"
+            className="border-2 border-gray-800 rounded-lg p-2 m-2 w-full"
+            defaultValue={""}
+          />
+          <button
+            className="hover:text-yellow-300"
+            onClick={handleStartAddingNewQuiz}
+          >
+            Submit
+          </button>
+        </div>
+      </div>
+    </div>
   );
 };

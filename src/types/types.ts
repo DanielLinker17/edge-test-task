@@ -9,7 +9,6 @@ export type Quiz = {
   id: string;
   title: string;
   questions: Question[];
-  isEditing: boolean;
 };
 
 export type Action =
@@ -37,7 +36,6 @@ export type State = {
   userAnswers: string[];
   currentQuestionIndex: number;
   secondsRemining: number;
-  score: number;
 };
 
 export type ContextProps = {

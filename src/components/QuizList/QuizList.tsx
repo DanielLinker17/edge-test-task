@@ -1,6 +1,7 @@
 import { useContext } from "react";
-import { QuizContext } from "../store/QuizContext";
-import { QuizListProps } from "../types/types";
+
+import { QuizContext } from "../../store/QuizContext/QuizContext";
+import type { QuizListProps } from "./QuizList.types";
 
 export const QuizList: React.FC<QuizListProps> = ({ quiz }) => {
   const { state, dispatch } = useContext(QuizContext);
@@ -39,7 +40,9 @@ export const QuizList: React.FC<QuizListProps> = ({ quiz }) => {
           <button
             disabled={isOnlyOneQuiz}
             onClick={() => handleDeleteQuiz(quiz.id)}
-            className="m-3 hover:text-yellow-300 cursor-pointer"
+            className="m-3 hover:text-yellow-300
+            disabled:opacity-50
+            cursor-pointer"
           >
             Delete
           </button>

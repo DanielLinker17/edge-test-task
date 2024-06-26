@@ -1,41 +1,47 @@
-import { useContext } from "react";
-import { QuizContext } from "../store/QuizContext";
-import { getCurrentQuiz } from "../helpers/getCurrentQuestionAndQuiz";
-import { Question } from "../types/types";
+import { useContext, useMemo } from "react";
+
+import { QuizContext } from "../../store/QuizContext/QuizContext";
+import { getCurrentQuiz } from "../../helpers/getCurrentQuestionAndQuiz";
+import type { Question } from "../../types";
 
 export const Statistics: React.FC = () => {
   const { state, dispatch } = useContext(QuizContext);
   const { userAnswers } = state;
   const currentQuiz = getCurrentQuiz(state.quizes, state.currentQuizId);
 
-  const score = userAnswers.reduce((acc: number, userAnswer, index) => {
-    if (userAnswer === currentQuiz.questions[index].rightAnswer) {
-      const points =
-        currentQuiz.questions[index].difficulty === "easy"
-          ? 10
-          : currentQuiz.questions[index].difficulty === "medium"
-          ? 20
-          : 30;
-      return acc + points;
-    } else {
-      return acc;
-    }
-  }, 0);
-
-  const maxPoints = currentQuiz.questions.reduce(
-    (acc: number, question: Question) => {
-      if (question.difficulty === "easy") {
-        return acc + 10;
-      } else if (question.difficulty === "medium") {
-        return acc + 20;
-      } else {
-        return acc + 30;
-      }
-    },
-    0
+  const score = useMemo(
+    () =>
+      userAnswers.reduce((acc: number, userAnswer, index) => {
+        if (userAnswer === currentQuiz.questions[index].rightAnswer) {
+          const points =
+            currentQuiz.questions[index].difficulty === "easy"
+              ? 10
+              : currentQuiz.questions[index].difficulty === "medium"
+              ? 20
+              : 30;
+          return acc + points;
+        } else {
+          return acc;
+        }
+      }, 0),
+    []
   );
 
-  const percentageRight = ((score / maxPoints) * 100).toFixed(1);
+  const maxPoints = useMemo(
+    () =>
+      currentQuiz.questions.reduce((acc: number, question: Question) => {
+        if (question.difficulty === "easy") {
+          return acc + 10;
+        } else if (question.difficulty === "medium") {
+          return acc + 20;
+        } else {
+          return acc + 30;
+        }
+      }, 0),
+    []
+  );
+
+  const percentageRight = useMemo(() => ((score / maxPoints) * 100).toFixed(1), [score, maxPoints]);
 
   const handleReset = () => {
     dispatch({ type: "RESET_QUIZ" });

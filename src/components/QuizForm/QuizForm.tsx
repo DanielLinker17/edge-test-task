@@ -1,104 +1,32 @@
-import { useContext, useState, useEffect } from "react";
-import { QuizContext } from "../store/QuizContext";
-import { Question, Quiz } from "../types/types";
-import { getCurrentQuiz } from "../helpers/getCurrentQuestionAndQuiz";
-import { createUniqueId } from "../helpers/createUniqueId";
+import { useContext } from "react";
+
+import { QuizContext } from "../../store/QuizContext/QuizContext";
+import { useAnswers } from "./useAnswers.hook";
+import { useQuestions } from "./useQuestions.hook";
+import { useQuiz } from "./useQuiz.hook";
 
 export const QuizForm: React.FC = () => {
   const { dispatch, state } = useContext(QuizContext);
-  const { quizes, editingQuizId, isQuizEditing, isAddingNewQuiz, newQuizTitle } = state;
-  
-  const targetQuiz = getCurrentQuiz(quizes, editingQuizId);
-  
-  const [newAnswer, setNewAnswer] = useState("");
-  const [newQuestion, setNewQuestion] = useState<Question>({
-    title: "",
-    answers: [],
-    rightAnswer: "",
-    difficulty: "",
+  const { isQuizEditing, isAddingNewQuiz } = state;
+
+  const { quiz, setQuiz, handleDeleteQuestion } = useQuiz();
+  const {
+    newQuestion,
+    handleQuestionTitle,
+    handleDeleteAnswer,
+    handleDifficultyLevel,
+    handleAddAnotherQuestion,
+    handleRightAnswer,
+    setNewQuestion,
+  } = useQuestions({ setQuiz });
+  const { newAnswer, handleNewAnswer, setNewAnswer } = useAnswers({
+    newQuestion,
+    setNewQuestion,
   });
-  const [quiz, setQuiz] = useState<Quiz | null>(null);
 
-  useEffect(() => {
-    if (isQuizEditing) {
-      setQuiz({ ...targetQuiz });
-    } else if (isAddingNewQuiz) {
-      setQuiz({
-        id: createUniqueId(),
-        title: newQuizTitle,
-        questions: [],
-      });
-    }
-  }, [isQuizEditing, isAddingNewQuiz, targetQuiz, newQuizTitle]);
-
-  const handleQuestionTitle = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setNewQuestion({ ...newQuestion, title: e.target.value });
-  };
-
-  const handleNewAnswer = () => {
-    if (newAnswer.trim() === "") {
-      alert("Answer cannot be empty");
-      return;
-    }
-
-    if (newQuestion.answers.includes(newAnswer)) {
-      alert("This answer already exists");
-      return;
-    }
-
-    setNewQuestion({
-      ...newQuestion,
-      answers: [...newQuestion.answers, newAnswer],
-    });
-    setNewAnswer("");
-  };
-
-  const handleDeleteAnswer = (index: number) => {
-    const newAnswers = newQuestion.answers.filter((_, answerIndex) => answerIndex !== index);
-    setNewQuestion({ ...newQuestion, answers: newAnswers });
-  };
-
-  const handleDifficultyLevel = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setNewQuestion({ ...newQuestion, difficulty: e.target.value });
-  };
 
   const handleGoBack = () => {
     dispatch({ type: "GO_BACK" });
-  };
-
-  const handleAddAnotherQuestion = () => {
-    if (
-      newQuestion.title === "" ||
-      newQuestion.answers.length === 0 ||
-      newQuestion.rightAnswer === "" ||
-      newQuestion.difficulty === ""
-    ) {
-      alert("Please fill all the fields");
-      return;
-    }
-
-    setQuiz((prevQuiz) => ({
-      ...prevQuiz!,
-      questions: [...prevQuiz!.questions, { ...newQuestion }],
-    }));
-
-    setNewQuestion({
-      title: "",
-      answers: [],
-      rightAnswer: "",
-      difficulty: "",
-    });
-  };
-
-  const handleDeleteQuestion = (index: number) => {
-    setQuiz((prevQuiz) => ({
-      ...prevQuiz!,
-      questions: prevQuiz!.questions.filter((_, questionIndex) => questionIndex !== index),
-    }));
-  };
-
-  const handleRightAnswer = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setNewQuestion({ ...newQuestion, rightAnswer: e.target.value });
   };
 
   const handleSubmit = () => {
@@ -154,7 +82,9 @@ export const QuizForm: React.FC = () => {
       </div>
       {newQuestion.answers.length !== 0 && (
         <div className="border-2 border-gray-800 rounded-lg p-2 shadow-md space-y-5">
-          {newQuestion.answers.length !== 0 && <p>Mark the right answer to current question</p>}
+         {newQuestion.answers.length !== 0 && (
+            <p>Mark the right answer to current question</p>
+          )}
           <ul style={{ maxHeight: "150px", overflow: "auto" }}>
             {newQuestion.answers.map((answer, index) => (
               <li key={index} className="text-gray-600 m-2 flex items-center">
@@ -179,7 +109,9 @@ export const QuizForm: React.FC = () => {
           </ul>
         </div>
       )}
-      <h2 className="text-xl font-bold text-gray-300">Choose difficulty level</h2>
+      <h2 className="text-xl font-bold text-gray-300">
+        Choose difficulty level
+      </h2>
       <ul className="flex justify-center space-x-10">
         <li key="easy">
           <input
@@ -238,7 +170,10 @@ export const QuizForm: React.FC = () => {
             : "This is the list of your questions:"}
         </h3>
         {quiz?.questions.map((question, index) => (
-          <li key={index} className="text-yellow-300 flex items-center font-bold text-sm">
+          <li
+          key={index}
+          className="text-yellow-300 flex items-center font-bold text-sm"
+        >
             <p>{question.title}</p>
             <button
               onClick={() => handleDeleteQuestion(index)}

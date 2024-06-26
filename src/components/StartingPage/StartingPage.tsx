@@ -1,6 +1,7 @@
 import { useContext, useRef } from "react";
-import { QuizList } from "./QuizList";
-import { QuizContext } from "../store/QuizContext";
+
+import { QuizContext } from "../../store/QuizContext/QuizContext";
+import { QuizList } from "../QuizList";
 
 export const StartingPage: React.FC = () => {
   const { state, dispatch } = useContext(QuizContext);
@@ -15,7 +16,6 @@ export const StartingPage: React.FC = () => {
         
       });
     }
-    console.log(state);
   };
 
   return (

@@ -1,9 +1,8 @@
 import { useContext } from "react";
-import "./App.css";
-import { StartingPage } from "./components/StartingPage";
-import { QuizContext } from "./store/QuizContext";
+import { StartingPage } from "./components/StartingPage/StartingPage";
+import { QuizContext } from "./store/QuizContext/QuizContext";
 import { QuizQuestions } from "./components/QuizQuestions";
-import { Statistics } from "./components/Statistics";
+import { Statistics } from "./components/Statistics/Statistics";
 import { QuizForm } from "./components/QuizForm";
 
 function App() {

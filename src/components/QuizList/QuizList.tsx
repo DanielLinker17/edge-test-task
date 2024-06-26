@@ -1,11 +1,14 @@
 import { useContext } from "react";
-import { QuizContext } from "../store/QuizContext";
-import { QuizListProps } from "../types/types";
+
+import { QuizContext } from "../../store/QuizContext";
+import type { QuizListProps } from "./QuizList.types";
 
 export const QuizList: React.FC<QuizListProps> = ({ quiz }) => {
   const { state, dispatch } = useContext(QuizContext);
   const isOnlyOneQuiz = state.quizes.length === 1;
 
+  // These all need to be wrapped with useCallback because they will be
+  // defined again and again when the component is rerendered.
   const handleStartQuiz = (id: string) => {
     dispatch({ type: "START_QUIZ", payload: id });
   };

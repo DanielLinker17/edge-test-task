@@ -1,4 +1,4 @@
-import { Question } from "../types/types";
+import { Question } from "../../types";
 
 export const initialQuestions: Question[] = [
   {
@@ -10,7 +10,7 @@ export const initialQuestions: Question[] = [
       "C) A database management system",
       "D) An operating system",
     ],
-    difficulty: 'easy',
+    difficulty: "easy",
   },
   {
     title: "Which of the following is NOT a core feature of React?",
@@ -21,7 +21,7 @@ export const initialQuestions: Question[] = [
       "C) Two-way data binding",
       "D) Component-based architecture",
     ],
-    difficulty: 'easy',
+    difficulty: "easy",
   },
   {
     title: "What does JSX stand for in React?",
@@ -32,7 +32,7 @@ export const initialQuestions: Question[] = [
       "C) JavaScript Execution",
       "D) JavaScript Xtra",
     ],
-    difficulty: 'easy',
+    difficulty: "easy",
   },
   {
     title: "What is the purpose of state in React?",
@@ -43,7 +43,7 @@ export const initialQuestions: Question[] = [
       "C) To manage server-side requests",
       "D) To control the layout of components",
     ],
-    difficulty: 'easy',
+    difficulty: "easy",
   },
   {
     title:
@@ -55,7 +55,7 @@ export const initialQuestions: Question[] = [
       "C) componentWillUnmount",
       "D) render",
     ],
-    difficulty: 'easy',
+    difficulty: "easy",
   },
   {
     title: "What is the function of the setState method in React?",
@@ -66,7 +66,7 @@ export const initialQuestions: Question[] = [
       "C) To render a component",
       "D) To import external libraries",
     ],
-    difficulty: 'easy',
+    difficulty: "easy",
   },
   {
     title: "What tool can you use for debugging React applications?",
@@ -77,7 +77,7 @@ export const initialQuestions: Question[] = [
       "C) Visual Studio Code",
       "D) Sublime Text",
     ],
-    difficulty: 'easy',
+    difficulty: "easy",
   },
   {
     title: "What is a React component?",
@@ -88,7 +88,7 @@ export const initialQuestions: Question[] = [
       "C) A JavaScript module",
       "D) A CSS stylesheet",
     ],
-    difficulty: 'easy',
+    difficulty: "easy",
   },
   {
     title:
@@ -100,13 +100,13 @@ export const initialQuestions: Question[] = [
       "C) Using context",
       "D) Using refs",
     ],
-    difficulty: 'easy',
+    difficulty: "easy",
   },
   {
     title:
       "What feature of React allows you to reuse code and isolate components?",
     rightAnswer: "A) Components",
     answers: ["A) Components", "B) Props", "C) State", "D) Hooks"],
-    difficulty: 'easy',
+    difficulty: "easy",
   },
 ];

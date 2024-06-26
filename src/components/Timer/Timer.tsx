@@ -1,7 +1,7 @@
 import { useContext } from "react";
-import { QuizContext } from "../store/QuizContext";
+import { QuizContext } from "../../store/QuizContext";
 
-export default function Timer() {
+export const Timer = () => {
   const { state } = useContext(QuizContext);
 
   return (
@@ -27,4 +27,4 @@ export default function Timer() {
       </h1>
     </div>
   );
-}
+};

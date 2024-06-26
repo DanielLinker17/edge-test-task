@@ -1,15 +1,20 @@
 import { useContext } from "react";
-import "./App.css";
-import { StartingPage } from "./components/StartingPage";
+
+import {
+  StartingPage,
+  QuizQuestions,
+  Statistics,
+  QuizForm,
+} from "./components";
 import { QuizContext } from "./store/QuizContext";
-import { QuizQuestions } from "./components/QuizQuestions";
-import { Statistics } from "./components/Statistics";
-import { QuizForm } from "./components/QuizForm";
+
+import "./App.css";
 
 function App() {
   const { state } = useContext(QuizContext);
   const { isQuizStarted, quizFinished, isAddingNewQuiz, isQuizEditing } = state;
 
+  // I'll use a react-router instead
   return (
     <>
       {!isQuizStarted && !isAddingNewQuiz && !isQuizEditing && <StartingPage />}

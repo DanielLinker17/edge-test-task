@@ -1,6 +1,7 @@
 import { useContext, useRef } from "react";
-import { QuizList } from "./QuizList";
-import { QuizContext } from "../store/QuizContext";
+
+import { QuizContext } from "../../store/QuizContext";
+import { QuizList } from "../QuizList";
 
 export const StartingPage: React.FC = () => {
   const { state, dispatch } = useContext(QuizContext);
@@ -12,9 +13,9 @@ export const StartingPage: React.FC = () => {
       dispatch({
         type: "START_ADDING_NEW_QUIZ",
         payload: inputRef.current.value,
-        
       });
     }
+    // Do not forget to remove unneeded console logs
     console.log(state);
   };
 

@@ -1,12 +1,17 @@
 import { useContext } from "react";
-import { QuizContext } from "../store/QuizContext";
-import Timer from "./Timer";
-import { getCurrentQuestionAndQuiz } from "../helpers/getCurrentQuestionAndQuiz";
+
+import { QuizContext } from "../../store/QuizContext";
+import { getCurrentQuestionAndQuiz } from "../../helpers/getCurrentQuestionAndQuiz";
+import { Timer } from "../Timer";
 
 export const QuizQuestions: React.FC = () => {
   const { state, dispatch } = useContext(QuizContext);
   const { currentQuestionIndex, currentQuizId, quizes } = state;
-  const { currentQuestion, targetQuiz } = getCurrentQuestionAndQuiz(quizes, currentQuizId, currentQuestionIndex);
+  const { currentQuestion, targetQuiz } = getCurrentQuestionAndQuiz(
+    quizes,
+    currentQuizId,
+    currentQuestionIndex
+  );
 
   const handleNextQuestion = (answer: string) => {
     dispatch({ type: "NEXT_QUESTION", payload: answer });
@@ -28,7 +33,7 @@ export const QuizQuestions: React.FC = () => {
           justifyContent: "space-between",
           alignItems: "center",
           margin: "0 auto",
-          overflow: "hidden"
+          overflow: "hidden",
         }}
       >
         <h2 className="text-2xl font-bold text-yellow-300 text-center">

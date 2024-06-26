@@ -1,27 +1,35 @@
-import { useContext } from "react";
-import { QuizContext } from "../store/QuizContext";
-import { getCurrentQuiz } from "../helpers/getCurrentQuestionAndQuiz";
-import { Question } from "../types/types";
+import { useContext, useMemo } from "react";
+
+import { QuizContext } from "../../store/QuizContext";
+import { getCurrentQuiz } from "../../helpers/getCurrentQuestionAndQuiz";
+import type { Question } from "../../types";
 
 export const Statistics: React.FC = () => {
+  // state can be passed directly from App
   const { state, dispatch } = useContext(QuizContext);
   const { userAnswers } = state;
   const currentQuiz = getCurrentQuiz(state.quizes, state.currentQuizId);
 
-  const score = userAnswers.reduce((acc: number, userAnswer, index) => {
-    if (userAnswer === currentQuiz.questions[index].rightAnswer) {
-      const points =
-        currentQuiz.questions[index].difficulty === "easy"
-          ? 10
-          : currentQuiz.questions[index].difficulty === "medium"
-          ? 20
-          : 30;
-      return acc + points;
-    } else {
-      return acc;
-    }
-  }, 0);
+  // This can be moved outside from the component
+  const score = useMemo(
+    () =>
+      userAnswers.reduce((acc: number, userAnswer, index) => {
+        if (userAnswer === currentQuiz.questions[index].rightAnswer) {
+          const points =
+            currentQuiz.questions[index].difficulty === "easy"
+              ? 10
+              : currentQuiz.questions[index].difficulty === "medium"
+              ? 20
+              : 30;
+          return acc + points;
+        } else {
+          return acc;
+        }
+      }, 0),
+    []
+  );
 
+  // This can be moved outside and wrapped with useMemo
   const maxPoints = currentQuiz.questions.reduce(
     (acc: number, question: Question) => {
       if (question.difficulty === "easy") {
@@ -35,11 +43,13 @@ export const Statistics: React.FC = () => {
     0
   );
 
+  // All calculation should be wrapped with useMemo
   const percentageRight = ((score / maxPoints) * 100).toFixed(1);
 
   const handleReset = () => {
     dispatch({ type: "RESET_QUIZ" });
   };
+
   return (
     <div className=" space-y-10">
       <div className=" space-y-10">
@@ -61,6 +71,7 @@ export const Statistics: React.FC = () => {
         "
       >
         {currentQuiz?.questions.map((question, index) => (
+          // Here can be a separate component, like QuizItem
           <li key={index} className="">
             <p className="rounded-full inline-block p-2 bg-yellow-300 font-bold">
               Nº{index + 1}
